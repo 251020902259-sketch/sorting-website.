@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Giải & Giả Lập Thuật Toán Sắp Xếp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header theo phong cách Canvas LMS -->
+    <header class="bg-[#2d3b45] text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-[#008ee2] p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide">Canvas LMS - Algorithm Solver</h1>
+                    <p class="text-xs text-slate-300">Công cụ giải chính xác bài tập sắp xếp & phân đoạn</p>
+                </div>
+            </div>
+            <span class="bg-[#008ee2]/20 text-[#008ee2] border border-[#008ee2]/40 text-xs font-semibold px-3 py-1 rounded-full">
+                Phiên bản Ôn thi Canvas
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Input Panel / Form -->
+        <section class="lg:col-span-5 bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between h-fit">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900 pb-3 border-b border-slate-100 mb-5 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-[#008ee2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    Thiết lập thông số
+                </h2>
+
+                <form id="calcForm" onsubmit="event.preventDefault(); calculate();" class="space-y-4">
+                    
+                    <!-- Dãy số vào -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Dãy số ban đầu (A):</label>
+                        <input type="text" id="inputArray" value="9, 7, 31, 8, 13, 50, 18" 
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm code-font focus:ring-2 focus:ring-[#008ee2] focus:bg-white focus:outline-none transition"
+                            placeholder="Nhập dãy số cách nhau bởi dấu phẩy">
+                        <p class="text-xs text-slate-500 mt-1">Ví dụ: 9, 7, 31, 8, 13, 50, 18</p>
+                    </div>
+
+                    <!-- Chọn thuật toán -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Thuật toán sắp xếp:</label>
+                        <select id="algoSelect" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-[#008ee2] focus:bg-white focus:outline-none transition">
+                            <option value="bubble">Sắp xếp nổi bọt (Bubble Sort)</option>
+                            <option value="insertion">Sắp xếp chèn (Insertion Sort)</option>
+                            <option value="selection">Sắp xếp lựa chọn (Selection Sort)</option>
+                            <option value="quick">Sắp xếp nhanh (Quick Sort - Lomuto Partition)</option>
+                        </select>
+                    </div>
+
+                    <!-- Chọn chiều -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Chiều sắp xếp:</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer transition hover:bg-slate-50 [&:has(:checked)]:border-[#008ee2] [&:has(:checked)]:bg-sky-50 [&:has(:checked)]:text-[#008ee2] font-medium text-sm">
+                                <input type="radio" name="sortOrder" value="asc" checked class="hidden">
+                                <span>Tăng dần (ASC)</span>
+                            </label>
+                            <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer transition hover:bg-slate-50 [&:has(:checked)]:border-[#008ee2] [&:has(:checked)]:bg-sky-50 [&:has(:checked)]:text-[#008ee2] font-medium text-sm">
+                                <input type="radio" name="sortOrder" value="desc" class="hidden">
+                                <span>Giảm dần (DESC)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Số bước lặp / phân đoạn -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" id="stepLabel">Số bước lặp (k):</label>
+                        <input type="number" id="stepK" min="1" max="50" value="3" 
+                            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold code-font focus:ring-2 focus:ring-[#008ee2] focus:bg-white focus:outline-none transition">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                        class="w-full mt-2 bg-[#008ee2] hover:bg-[#0076bc] text-white font-bold py-3 px-4 rounded-lg shadow-sm hover:shadow transition flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Tính Kết Quả Ngay</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Quick Info Box -->
+            <div class="mt-6 p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 leading-relaxed">
+                <b>💡 Mẹo ôn thi Canvas LMS:</b> Kết quả dạng chuỗi không khoảng trắng (Ví dụ: <code>31,13,50,18,9,8,7</code>) được tạo tự động để bạn copy dán thẳng vào ô trả lời bài thi!
+            </div>
+        </section>
+
+        <!-- Output / Result Panel -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <!-- Result Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">KẾT QUẢ ĐÁP ÁN (BƯỚC k)</h3>
+                    <span id="algoBadge" class="bg-slate-100 text-slate-700 text-xs font-medium px-2.5 py-1 rounded">Chưa tính</span>
+                </div>
+
+                <div class="bg-sky-50/70 border-2 border-[#008ee2]/30 rounded-xl p-4 relative">
+                    <p class="text-xs text-slate-500 font-medium mb-1">Dãy kết quả sau bước <span id="resStepK">k</span> (Đã xóa khoảng trắng):</p>
+                    <div class="flex items-center justify-between">
+                        <span id="outputFormatted" class="text-xl md:text-2xl font-bold text-[#008ee2] code-font tracking-wide break-all">--</span>
+                        <button onclick="copyToClipboard()" id="btnCopy" 
+                            class="ml-3 shrink-0 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center space-x-1 shadow-sm">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <span id="copyText">Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between text-xs text-slate-500 px-1">
+                    <span>Chuỗi chuẩn LMS: <code id="rawString" class="font-bold text-slate-700">--</code></span>
+                </div>
+            </div>
+
+            <!-- Detailed Steps Log -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h3 class="text-base font-bold text-slate-900 pb-3 border-b border-slate-100 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Chi Tiết Từng Bước Tự Động Giải
+                </h3>
+
+                <div id="stepsTimeline" class="space-y-3 max-h-[450px] overflow-y-auto pr-2">
+                    <p class="text-sm text-slate-400 italic text-center py-6">Nhập dữ liệu và nhấn "Tính Kết Quả Ngay" để xem diễn giải các bước.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        Được thiết kế chuẩn cấu trúc thuật toán đếm bước thi Canvas LMS &bull; Tối ưu giải nhanh trắc nghiệm
+    </footer>
+
+    <script>
+        // Update label dynamically when algorithm changes
+        document.getElementById('algoSelect').addEventListener('change', function(e) {
+            const label = document.getElementById('stepLabel');
+            if (e.target.value === 'quick') {
+                label.innerText = 'Số lần phân đoạn Lomuto (k):';
+            } else {
+                label.innerText = 'Số bước lặp (k):';
+            }
+        });
+
+        function parseInputArray() {
+            const raw = document.getElementById('inputArray').value;
+            return raw.split(',')
+                      .map(item => item.trim())
+                      .filter(item => item !== '')
+                      .map(Number);
+        }
+
+        function calculate() {
+            const arr = parseInputArray();
+            if (arr.some(isNaN) || arr.length === 0) {
+                alert('Vui lòng nhập dãy số hợp lệ (cách nhau bởi dấu phẩy)!');
+                return;
+            }
+
+            const algo = document.getElementById('algoSelect').value;
+            const isAsc = document.querySelector('input[name="sortOrder"]:checked').value === 'asc';
+            const targetK = parseInt(document.getElementById('stepK').value) || 1;
+
+            let resultData;
+            if (algo === 'bubble') {
+                resultData = runBubbleSort([...arr], isAsc, targetK);
+            } else if (algo === 'insertion') {
+                resultData = runInsertionSort([...arr], isAsc, targetK);
+            } else if (algo === 'selection') {
+                resultData = runSelectionSort([...arr], isAsc, targetK);
+            } else if (algo === 'quick') {
+                resultData = runQuickSortLomuto([...arr], isAsc, targetK);
+            }
+
+            displayResult(resultData, targetK, algo);
+        }
+
+        // 1. Bubble Sort (Nổi bọt)
+        function runBubbleSort(arr, isAsc, targetK) {
+            const steps = [];
+            const n = arr.length;
+            let currentArr = [...arr];
+
+            for (let i = 0; i < n - 1; i++) {
+                let swapped = false;
+                for (let j = 0; j < n - 1 - i; j++) {
+                    const condition = isAsc ? (currentArr[j] > currentArr[j + 1]) : (currentArr[j] < currentArr[j + 1]);
+                    if (condition) {
+                        let temp = currentArr[j];
+                        currentArr[j] = currentArr[j + 1];
+                        currentArr[j + 1] = temp;
+                        swapped = true;
+                    }
+                }
+                steps.push({
+                    stepNum: i + 1,
+                    arrState: [...currentArr],
+                    desc: `Sau bước ${i + 1}: Đã đưa phần tử ${isAsc ? 'lớn' : 'nhỏ'} nhất còn lại (${currentArr[n - 1 - i]}) về cuối.`
+                });
+            }
+
+            return steps;
+        }
+
+        // 2. Insertion Sort (Chèn)
+        function runInsertionSort(arr, isAsc, targetK) {
+            const steps = [];
+            const n = arr.length;
+            let currentArr = [...arr];
+
+            for (let i = 1; i < n; i++) {
+                let key = currentArr[i];
+                let j = i - 1;
+                
+                while (j >= 0 && (isAsc ? currentArr[j] > key : currentArr[j] < key)) {
+                    currentArr[j + 1] = currentArr[j];
+                    j--;
+                }
+                currentArr[j + 1] = key;
+
+                steps.push({
+                    stepNum: i,
+                    arrState: [...currentArr],
+                    desc: `Sau bước ${i} (chèn phần tử index ${i} là ${key}): Dãy con 0..${i} đã được sắp xếp.`
+                });
+            }
+
+            return steps;
+        }
+
+        // 3. Selection Sort (Lựa chọn)
+        function runSelectionSort(arr, isAsc, targetK) {
+            const steps = [];
+            const n = arr.length;
+            let currentArr = [...arr];
+
+            for (let i = 0; i < n - 1; i++) {
+                let targetIdx = i;
+                for (let j = i + 1; j < n; j++) {
+                    const condition = isAsc ? (currentArr[j] < currentArr[targetIdx]) : (currentArr[j] > currentArr[targetIdx]);
+                    if (condition) {
+                        targetIdx = j;
+                    }
+                }
+                if (targetIdx !== i) {
+                    let temp = currentArr[i];
+                    currentArr[i] = currentArr[targetIdx];
+                    currentArr[targetIdx] = temp;
+                }
+
+                steps.push({
+                    stepNum: i + 1,
+                    arrState: [...currentArr],
+                    desc: `Sau bước ${i + 1}: Đổi chỗ vị trí ${i} với phần tử ${isAsc ? 'nhỏ' : 'lớn'} nhất còn lại (${currentArr[i]}).`
+                });
+            }
+
+            return steps;
+        }
+
+        // 4. Quick Sort - Lomuto Partition
+        function runQuickSortLomuto(arr, isAsc, targetK) {
+            const steps = [];
+            let currentArr = [...arr];
+            let partitionCount = 0;
+
+            function lomutoPartition(low, high) {
+                let pivot = currentArr[high];
+                let i = low - 1;
+
+                for (let j = low; j < high; j++) {
+                    const condition = isAsc ? (currentArr[j] <= pivot) : (currentArr[j] >= pivot);
+                    if (condition) {
+                        i++;
+                        let temp = currentArr[i];
+                        currentArr[i] = currentArr[j];
+                        currentArr[j] = temp;
+                    }
+                }
+                let temp = currentArr[i + 1];
+                currentArr[i + 1] = currentArr[high];
+                currentArr[high] = temp;
+
+                partitionCount++;
+                steps.push({
+                    stepNum: partitionCount,
+                    arrState: [...currentArr],
+                    desc: `Phân đoạn ${partitionCount} (Đoạn [${low}..${high}], Chốt Pivot = ${pivot}): Đưa pivot về đúng vị trí index ${i + 1}.`
+                });
+
+                return i + 1;
+            }
+
+            function quickSort(low, high) {
+                if (low < high) {
+                    let pi = lomutoPartition(low, high);
+                    quickSort(low, pi - 1);
+                    quickSort(pi + 1, high);
+                }
+            }
+
+            quickSort(0, currentArr.length - 1);
+            return steps;
+        }
+
+        // Display results to DOM
+        function displayResult(steps, targetK, algo) {
+            const timeline = document.getElementById('stepsTimeline');
+            const outputFormatted = document.getElementById('outputFormatted');
+            const rawString = document.getElementById('rawString');
+            const resStepK = document.getElementById('resStepK');
+            const algoBadge = document.getElementById('algoBadge');
+
+            const algoNames = {
+                'bubble': 'Bubble Sort',
+                'insertion': 'Insertion Sort',
+                'selection': 'Selection Sort',
+                'quick': 'Quick Sort (Lomuto)'
+            };
+            algoBadge.innerText = algoNames[algo];
+
+            timeline.innerHTML = '';
+            resStepK.innerText = targetK;
+
+            if (steps.length === 0) {
+                outputFormatted.innerText = "Dãy quá ngắn hoặc không cần sắp xếp.";
+                return;
+            }
+
+            // Lay buoc thu k (hoac buoc cuoi cung neu k vuot qua)
+            const actualIndex = Math.min(targetK, steps.length) - 1;
+            const targetState = steps[actualIndex].arrState;
+            const formattedStr = targetState.join(',');
+
+            outputFormatted.innerText = formattedStr;
+            rawString.innerText = formattedStr;
+
+            // Render Timeline Steps
+            steps.forEach((step, idx) => {
+                const isTargetStep = (idx + 1 === targetK) || (targetK > steps.length && idx === steps.length - 1);
+                
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-lg border text-sm transition ${
+                    isTargetStep 
+                    ? 'bg-sky-50 border-[#008ee2] ring-1 ring-[#008ee2]' 
+                    : 'bg-slate-50 border-slate-200'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between font-semibold mb-1">
+                        <span class="${isTargetStep ? 'text-[#008ee2]' : 'text-slate-700'}">
+                            Bước ${step.stepNum} ${isTargetStep ? '📌 (Kết quả bạn cần)' : ''}
+                        </span>
+                        <span class="code-font text-xs bg-white px-2 py-0.5 rounded border border-slate-200">
+                            ${step.arrState.join(',')}
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-600">${step.desc}</p>
+                `;
+                timeline.appendChild(card);
+            });
+        }
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById('outputFormatted').innerText;
+            if (textToCopy === '--') return;
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const copyText = document.getElementById('copyText');
+            copyText.innerText = 'Đã Copy!';
+            setTimeout(() => {
+                copyText.innerText = 'Copy';
+            }, 2000);
+        }
+
+        // Run default calculation on initial load
+        window.onload = function() {
+            calculate();
+        };
+    </script>
+</body>
+</html>
